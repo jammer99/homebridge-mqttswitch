@@ -1,3 +1,6 @@
+# ORIGINAL WORK BY ilcato
+[https://github.com/ilcato/homebridge-mqttswitch](https://github.com/ilcato/homebridge-mqttswitch)
+
 # homebridge-mqttswitch
 An homebridge plugin that create an HomeKit Switch accessory mapped on MQTT topics
 
