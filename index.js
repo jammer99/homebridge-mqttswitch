@@ -33,7 +33,8 @@ function MqttSwitchAccessory(log, config) {
     this.name = config["name"];
     this.url = config["url"];
     this.publish_options = {
-        qos: ((config["qos"] !== undefined) ? config["qos"] : 0)
+        qos: ((config["qos"] !== undefined) ? config["qos"] : 0),
+        retain: ((config["retain"] !== undefined) ? config["retain"] : true)
     };
     this.client_Id = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
     this.options = {

@@ -27,7 +27,7 @@
   "dependencies": {
     "mqtt": "^1.6.3"
   },
-  "author": "ilcato",
+  "author": "ijammer99",
   "license": "GPL2",
   "bugs": {
     "url": "https://github.com/jammer99/homebridge-mqttswitch2/issues"
