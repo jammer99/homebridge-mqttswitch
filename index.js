@@ -48,8 +48,8 @@ function MqttSwitchAccessory(log, config) {
         will: {
             topic: 'WillMsg',
             payload: 'Connection Closed abnormally..!',
-            qos: config["qos"],
-            retain: config["retain"]
+            qos: 0,
+            retain: false
         },
         username: config["username"],
         password: config["password"],
