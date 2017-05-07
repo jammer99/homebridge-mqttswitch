@@ -1,32 +1,7 @@
-// MQTT Switch Accessory plugin for HomeBridge
-//
-// Remember to add accessory to config.json. Example:
-// "accessories": [
-//     {
-//            "accessory": "mqttswitch",
-//            "name": "PUT THE NAME OF YOUR SWITCH HERE",
-//            "url": "PUT URL OF THE BROKER HERE",
-//			  "username": "PUT USERNAME OF THE BROKER HERE",
-//            "password": "PUT PASSWORD OF THE BROKER HERE"
-// 			  "caption": "PUT THE LABEL OF YOUR SWITCH HERE",
-// 			  "topics": {
-// 				"statusGet": 	"PUT THE MQTT TOPIC FOR THE GETTING THE STATUS OF YOUR SWITCH HERE",
-// 				"statusSet": 	"PUT THE MQTT TOPIC FOR THE SETTING THE STATUS OF YOUR SWITCH HERE"
-// 			  },
-//			  "onValue": "OPTIONALLY PUT THE VALUE THAT MEANS ON HERE (DEFAULT true)",
-//			  "offValue": "OPTIONALLY PUT THE VALUE THAT MEANS OFF HERE (DEFAULT false)",
-//			  "integerValue": "OPTIONALLY SET THIS TRUE TO USE 1/0 AS VALUES",
-//     }
-// ],
-//
-// When you attempt to add a device, it will ask for a "PIN code".
-// The default code for all HomeBridge accessories is 031-45-154.
-
 'use strict';
 
 var Service, Characteristic;
 var mqtt = require("mqtt");
-
 
 function MqttSwitchAccessory(log, config) {
     this.log = log;
@@ -79,7 +54,6 @@ function MqttSwitchAccessory(log, config) {
     this.client.on('error', function () {
         that.log('Error event on MQTT');
     });
-
     this.client.on('message', function (topic, message) {
         if (topic == that.topicStatusGet) {
             var status = message.toString();
@@ -96,8 +70,10 @@ module.exports = function (homebridge) {
 
     homebridge.registerAccessory("homebridge-mqttswitch2", "mqttswitch2", MqttSwitchAccessory);
 }
-
-MqttSwitchAccessory.prototype.getStatus = function (callback) {
+MqttSwitchAccessory.prototype.getStatus = function(callback) {
+    if (this.statusCmd !== undefined) {
+    this.client.publish(this.topicStatusSet, this.statusCmd, this.publish_options);
+    }
     callback(null, this.switchStatus);
 }
 
