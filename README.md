@@ -6,11 +6,15 @@ An homebridge plugin that create an HomeKit Switch accessory mapped on MQTT topi
 
 # Installation
 Follow the instruction in [homebridge](https://www.npmjs.com/package/homebridge) for the homebridge server installation.
-The plugin is published through [NPM](https://www.npmjs.com/package/homebridge-mqttswitch) and should be installed "globally" by typing:
+The plugin is published through [NPM](https://www.npmjs.com/package/homebridge-mqttswitch2) and should be installed "globally" by typing:
 
     npm install -g homebridge-mqttswitch2
     
 # Release notes
+Version 0.0.5
++ Added Perisitent MQTT messages
++ Added qos settings for MQTT
+
 Version 0.0.3
 + Added onValue, offValue and integerValue params
 
@@ -33,4 +37,4 @@ Remember to configure the plugin in config.json in your home directory inside th
 + "offValue": "OPTIONALLY PUT THE VALUE THAT MEANS OFF HERE (DEFAULT false)",
 + "integerValue": "OPTIONALLY SET THIS TRUE TO USE 1/0 AS VALUES"
 
-Look for a sample config in [config.json example](https://github.com/ilcato/homebridge-mqttswitch/blob/master/config.json)
+Look for a sample config in [config.json example](https://github.com/jammer99/homebridge-mqttswitch2/blob/master/config.json)
