@@ -30,59 +30,66 @@ function MqttSwitchAccessory(log, config) {
         password: config["password"],
         rejectUnauthorized: false
     };
+
     this.caption = config["caption"];
     this.topicStatusGet = config["topics"].statusGet;
     this.topicStatusSet = config["topics"].statusSet;
+    this.topicStatusGetR = config["topics"].statusGetR;
+    this.topicStatusSetR = config["topics"].statusSetR;
     this.onValue = (config["onValue"] !== undefined) ? config["onValue"] : "true";
     this.offValue = (config["offValue"] !== undefined) ? config["offValue"] : "false";
+
     if (config["integerValue"]) {
         this.onValue = "1";
         this.offValue = "0";
     }
 
     this.switchStatus = false;
+    this.rotationSpeed = 0;
+    this.type = config["type"];
 
-    if (config["type"] !== "fan") {
+    if (this.type !== "fan") {
         this.service = new Service.Switch(this.name);
+        this.service
+            .getCharacteristic(Characteristic.On)
+            .on('get', this.getStatus.bind(this))
+            .on('set', this.setStatus.bind(this));
     }
     else {
         this.service = new Service.Fan(this.name);
-
-        this.service.getCharacteristic(Characteristic.Brightness)
-            .on('get', this.getBrightness.bind(this))
-            .on('set', this.setBrightness.bind(this));
+        this.service
+            .getCharacteristic(Characteristic.On)
+            .on('get', this.getStatus.bind(this))
+            .on('set', this.setStatus.bind(this));
+        this.service
+            .getCharacteristic(Characteristic.RotationSpeed)
+            .on('get', this.getRotationSpeed.bind(this))
+            .on('set', this.setRotationSpeed.bind(this));
     }
-    this.service
-        .getCharacteristic(Characteristic.On)
-        .on('get', this.getStatus.bind(this))
-        .on('set', this.setStatus.bind(this));
 
     // connect to MQTT broker
     this.client = mqtt.connect(this.url, this.options);
     var that = this;
-    this.client.on('error', function () {
-        that.log('Error event on MQTT');
+    this.client.on('error', function (e) {
+        that.log('Error event on MQTT', e);
     });
     this.client.on('message', function (topic, message) {
-
         if (topic == that.topicStatusGet) {
             var status = message.toString();
-            var status = message.toString();
-            if (self.isInt(status)) {
-                status = parseInt(status);
-                self.on = status > 0;
-                if (status > 0) {
-                    self.brightness = status;
-                }
-                self.service.getCharacteristic(Characteristic.On).setValue(self.on, undefined, 'fromSetValue');
-                self.service.getCharacteristic(Characteristic.Brightness).setValue(self.brightness, undefined, 'fromSetValue');
-            } else {
-                that.switchStatus = (status == that.onValue) ? true : false;
-                that.service.getCharacteristic(Characteristic.On).setValue(that.switchStatus, undefined, 'fromSetValue');
-            }
+            that.switchStatus = (status == that.onValue) ? true : false;
+            that.service.getCharacteristic(Characteristic.On).setValue(that.switchStatus, undefined, 'fromSetValue');
+
         }
+        if (topic == that.topicStatusGetR) {
+            var val = parseInt(message.toString());
+            that.rotationSpeed = val;
+            that.service.getCharacteristic(Characteristic.RotationSpeed).setValue(that.rotationSpeed, undefined, 'fromSetValue');
+        }
+
     });
     this.client.subscribe(this.topicStatusGet);
+    if (this.type == "fan")
+        this.client.subscribe(this.topicStatusGetR);
 }
 
 module.exports = function (homebridge) {
@@ -110,17 +117,18 @@ MqttSwitchAccessory.prototype.setStatus = function (status, callback, context) {
     callback();
 }
 
-MqttSwitchAccessory.prototype.getBrightness = function (callback) {
-    callback(null, this.brightness);
-};
 
-MqttSwitchAccessory.prototype.setBrightness = function (brightness, callback, context) {
+MqttSwitchAccessory.prototype.getRotationSpeed = function (callback) {
+    callback(null, this.rotationSpeed);
+}
+
+MqttSwitchAccessory.prototype.setRotationSpeed = function (rotationSp, callback, context) {
     if (context !== 'fromSetValue') {
-        this.brightness = brightness;
-        this.client.publish(this.topics.statusSet, this.brightness.toString());
+        this.rotationSpeed = rotationSp;
+        this.client.publish(this.topicStatusSetR, this.rotationSpeed.toString());
     }
     callback();
-};
+}
 
 MqttSwitchAccessory.prototype.getServices = function () {
     return [this.service];

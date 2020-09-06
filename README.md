@@ -8,8 +8,9 @@ The plugin is published through [NPM](https://www.npmjs.com/package/homebridge-m
     npm install -g homebridge-mqttswitch2
     
 # Release notes
-Version 0.1.0
+Version 0.1.1
 + Added Fan Accessory
++ Bug fixes
 
 Version 0.0.5
 + Added Perisitent MQTT messages
