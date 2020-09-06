@@ -125,7 +125,7 @@ MqttSwitchAccessory.prototype.getRotationSpeed = function (callback) {
 MqttSwitchAccessory.prototype.setRotationSpeed = function (rotationSp, callback, context) {
     if (context !== 'fromSetValue') {
         this.rotationSpeed = rotationSp;
-        this.client.publish(this.topicStatusSetR, this.rotationSpeed.toString());
+        this.client.publish(this.topicStatusSetR, this.rotationSpeed.toString(), this.publish_options);
     }
     callback();
 }

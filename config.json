@@ -5,17 +5,14 @@
         "port": 51826,
         "pin": "031-45-154"
     },
-
     "description": "This is an example configuration file. You can use this as a template for creating your own configuration file.",
-
-    "platforms": [
-    ],
+    "platforms": [],
     "accessories": [
         {
             "accessory": "mqttswitch2",
             "name": "PUT THE NAME OF YOUR SWITCH HERE",
             "url": "PUT URL OF THE BROKER HERE",
-            "type":"fan or switch",
+            "type": "fan or switch",
             "username": "PUT USERNAME OF THE BROKER HERE",
             "password": "PUT PASSWORD OF THE BROKER HERE",
             "caption": "PUT THE LABEL OF YOUR SWITCH HERE",
