@@ -42,11 +42,20 @@ function MqttSwitchAccessory(log, config) {
 
     this.switchStatus = false;
 
-    this.service = new Service.Switch(this.name);
+    if (config["type"] !== "fan") {
+        this.service = new Service.Switch(this.name);
+    }
+    else {
+        this.service = new Service.Fan(this.name);
+
+        this.service.getCharacteristic(Characteristic.Brightness)
+            .on('get', this.getBrightness.bind(this))
+            .on('set', this.setBrightness.bind(this));
+    }
     this.service
-            .getCharacteristic(Characteristic.On)
-            .on('get', this.getStatus.bind(this))
-            .on('set', this.setStatus.bind(this));
+        .getCharacteristic(Characteristic.On)
+        .on('get', this.getStatus.bind(this))
+        .on('set', this.setStatus.bind(this));
 
     // connect to MQTT broker
     this.client = mqtt.connect(this.url, this.options);
@@ -55,10 +64,22 @@ function MqttSwitchAccessory(log, config) {
         that.log('Error event on MQTT');
     });
     this.client.on('message', function (topic, message) {
+
         if (topic == that.topicStatusGet) {
             var status = message.toString();
-            that.switchStatus = (status == that.onValue) ? true : false;
-            that.service.getCharacteristic(Characteristic.On).setValue(that.switchStatus, undefined, 'fromSetValue');
+            var status = message.toString();
+            if (self.isInt(status)) {
+                status = parseInt(status);
+                self.on = status > 0;
+                if (status > 0) {
+                    self.brightness = status;
+                }
+                self.service.getCharacteristic(Characteristic.On).setValue(self.on, undefined, 'fromSetValue');
+                self.service.getCharacteristic(Characteristic.Brightness).setValue(self.brightness, undefined, 'fromSetValue');
+            } else {
+                that.switchStatus = (status == that.onValue) ? true : false;
+                that.service.getCharacteristic(Characteristic.On).setValue(that.switchStatus, undefined, 'fromSetValue');
+            }
         }
     });
     this.client.subscribe(this.topicStatusGet);
@@ -70,9 +91,13 @@ module.exports = function (homebridge) {
 
     homebridge.registerAccessory("homebridge-mqttswitch2", "mqttswitch2", MqttSwitchAccessory);
 }
-MqttSwitchAccessory.prototype.getStatus = function(callback) {
+MqttSwitchAccessory.prototype.isInt = function (value) {
+    return /^-?[0-9]+$/.test(value);
+};
+
+MqttSwitchAccessory.prototype.getStatus = function (callback) {
     if (this.statusCmd !== undefined) {
-    this.client.publish(this.topicStatusSet, this.statusCmd, this.publish_options);
+        this.client.publish(this.topicStatusSet, this.statusCmd, this.publish_options);
     }
     callback(null, this.switchStatus);
 }
@@ -84,6 +109,18 @@ MqttSwitchAccessory.prototype.setStatus = function (status, callback, context) {
     }
     callback();
 }
+
+MqttSwitchAccessory.prototype.getBrightness = function (callback) {
+    callback(null, this.brightness);
+};
+
+MqttSwitchAccessory.prototype.setBrightness = function (brightness, callback, context) {
+    if (context !== 'fromSetValue') {
+        this.brightness = brightness;
+        this.client.publish(this.topics.statusSet, this.brightness.toString());
+    }
+    callback();
+};
 
 MqttSwitchAccessory.prototype.getServices = function () {
     return [this.service];

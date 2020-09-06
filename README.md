@@ -1,6 +1,3 @@
-# ORIGINAL WORK BY ilcato
-[https://github.com/ilcato/homebridge-mqttswitch](https://github.com/ilcato/homebridge-mqttswitch)
-
 # homebridge-mqttswitch
 An homebridge plugin that create an HomeKit Switch accessory mapped on MQTT topics
 
@@ -11,6 +8,9 @@ The plugin is published through [NPM](https://www.npmjs.com/package/homebridge-m
     npm install -g homebridge-mqttswitch2
     
 # Release notes
+Version 0.1.0
++ Added Fan Accessory
+
 Version 0.0.5
 + Added Perisitent MQTT messages
 + Added qos settings for MQTT
@@ -26,6 +26,7 @@ Remember to configure the plugin in config.json in your home directory inside th
 + "accessory": "mqttswitch",
 + "name": "PUT THE NAME OF YOUR SWITCH HERE",
 + "url": "PUT URL OF THE BROKER HERE",
++ "type" : "switch or fan",
 + "username": "PUT USERNAME OF THE BROKER HERE",
 + "password": "PUT PASSWORD OF THE BROKER HERE",
 + "caption": "PUT THE LABEL OF YOUR SWITCH HERE",
